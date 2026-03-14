@@ -1,4 +1,4 @@
-import { Conversation } from "https://esm.sh/@elevenlabs/client";
+import { Conversation, TextConversation } from "https://esm.sh/@elevenlabs/client";
 
 // For a static site on GitHub Pages, we cannot use Node.js environment variables.
 // Since this is client-side code, the Agent ID must be included in the source.
@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let conversation = null;
     let isVoiceMode = false;
+    let isCurrentSessionVoice = false;
 
     // Helper to add a message to the UI
     function appendMessage(text, role) {
@@ -64,11 +65,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Initialize or get connection
-    async function getOrInitConversation() {
+    async function getOrInitConversation(useVoice = false) {
+        // If switching between text and voice modes, end the existing session
+        if (conversation && isCurrentSessionVoice !== useVoice) {
+            await conversation.endSession();
+            conversation = null;
+        }
+
         if (!conversation) {
             try {
-                // We keep it muted by default initially, to enforce text-only mode on first setup
-                conversation = await Conversation.startSession({
+                const options = {
                     agentId: AGENT_ID,
                     onMessage: (message) => {
                         // Append the AI's response text to the UI
@@ -97,10 +103,15 @@ document.addEventListener("DOMContentLoaded", () => {
                             micBtn.classList.remove("speaking");
                         }
                     }
-                });
+                };
 
-                // Set initial volume based on mode
-                await conversation.setVolume({ volume: isVoiceMode ? 1 : 0 });
+                if (useVoice) {
+                    conversation = await Conversation.startSession(options);
+                    await conversation.setVolume({ volume: 1 });
+                } else {
+                    conversation = await TextConversation.startSession(options);
+                }
+                isCurrentSessionVoice = useVoice;
 
             } catch (error) {
                 console.error("Failed to start session:", error);
@@ -127,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Show thinking indicator while agent processes
         showThinkingIndicator();
 
-        const conv = await getOrInitConversation();
+        const conv = await getOrInitConversation(false);
         if (conv) {
             // Unmute audio output if you want voice response, but user requested text-only response for text input
             await conv.setVolume({ volume: 0 });
@@ -163,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Add a visual indicator to the user that they are in a voice session, and prompt for mic
             appendMessage("Listening...", "user"); // Optional: placeholder for voice input UX
 
-            const conv = await getOrInitConversation();
+            const conv = await getOrInitConversation(true);
             if (conv) {
                 // Unmute audio output for voice mode
                 await conv.setVolume({ volume: 1 });
