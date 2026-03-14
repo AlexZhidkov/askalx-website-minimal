@@ -26,16 +26,16 @@ document.addEventListener("DOMContentLoaded", () => {
         msgText.textContent = text;
 
         msgWrapper.appendChild(msgText);
-        chatHistory.appendChild(msgWrapper);
+        chatHistory.prepend(msgWrapper);
 
-        // Ensure chat history is visible and scroll to bottom
+        // Ensure chat history is visible and scroll to top
         chatHistory.style.display = "flex";
 
         // Minimal transition to chat view by adding class to body
         document.body.classList.add("chat-active");
 
         setTimeout(() => {
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            chatHistory.scrollTop = 0;
         }, 50);
     }
 
@@ -50,12 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
         msgText.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
         
         msgWrapper.appendChild(msgText);
-        chatHistory.appendChild(msgWrapper);
+        chatHistory.prepend(msgWrapper);
         chatHistory.style.display = "flex";
         document.body.classList.add("chat-active");
         
         setTimeout(() => {
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            chatHistory.scrollTop = 0;
         }, 50);
     }
 
