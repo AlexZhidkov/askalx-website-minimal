@@ -38,6 +38,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 50);
     }
 
+    function showThinkingIndicator() {
+        removeThinkingIndicator();
+        
+        const msgWrapper = document.createElement("div");
+        msgWrapper.className = `message msg-ai thinking-indicator`;
+        
+        const msgText = document.createElement("div");
+        msgText.className = "msg-text";
+        msgText.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
+        
+        msgWrapper.appendChild(msgText);
+        chatHistory.appendChild(msgWrapper);
+        chatHistory.style.display = "flex";
+        document.body.classList.add("chat-active");
+        
+        setTimeout(() => {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }, 50);
+    }
+
+    function removeThinkingIndicator() {
+        const indicators = document.querySelectorAll('.thinking-indicator');
+        indicators.forEach(i => i.remove());
+    }
+
     // Initialize or get connection
     async function getOrInitConversation() {
         if (!conversation) {
@@ -48,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     onMessage: (message) => {
                         // Append the AI's response text to the UI
                         if (message.source === "ai" && message.message) {
+                            removeThinkingIndicator();
                             appendMessage(message.message, "ai");
                         }
                     },
@@ -98,20 +124,18 @@ document.addEventListener("DOMContentLoaded", () => {
         isVoiceMode = false;
         resetMicUI();
 
+        // Show thinking indicator while agent processes
+        showThinkingIndicator();
+
         const conv = await getOrInitConversation();
         if (conv) {
-            // Mute audio output for text mode
+            // Unmute audio output if you want voice response, but user requested text-only response for text input
             await conv.setVolume({ volume: 0 });
-            // By design, ElevenLabs client sends text via microphone context usually, or we can use sendText (if available in current SDK version).
-            // We use simple setVolume(0) to ensure the reply isn't spoken, and we get text callback.
-            // As of latest ESM packages for `@elevenlabs/client`, if sendText is supported natively we can use it, else we rely on natural connection logic.
-            // However, typical usage for purely text input usually requires a specific endpoint, but we can attempt to interact natively if the SDK supports it.
-            // Wait for agent to process
-            // *Note: if standard conversational SDK strictly expects mic input, text-only might require specific API endpoints. Assuming SDK handles it or we gracefully fallback.*
-
-            // For now, let's just make sure it's muted if it speaks. 
-            // *Update*: If the client library doesn't expose sendText natively, we'll need to adapt. Assuming `sendText` or similar exists based on JS integrations.
-            // Let's rely on standard SDK features and handle gracefully if not present.
+            
+            // Send text to the ElevenLabs Agent
+            conv.sendUserMessage(text);
+        } else {
+            removeThinkingIndicator();
         }
     });
 
