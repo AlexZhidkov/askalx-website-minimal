@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASKALX - AI Specialist</title>
+    <meta name="description" content="Discover how ASKALX AI Specialist can help you to run your business.">
+    <!-- Preconnect to Google Fonts for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Import Inter font, matching the premium look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="fade-in-up">What can an AI agent do for you?</h1>
+        <div class="logo fade-in-up delay-1">A S K A L X</div>
+        
+        <div class="chat-interface fade-in-up delay-2">
+            <div class="chat-history" id="chat-history">
+                <!-- Messages will appear here -->
+            </div>
+            
+            <form id="chat-form" class="search-container">
+                <input type="text" id="chat-input" placeholder="Chat with AI agent..." autocomplete="off">
+                <button type="button" id="mic-btn" aria-label="Start Voice Chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mic-icon"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>
